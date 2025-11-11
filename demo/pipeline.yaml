@@ -1,0 +1,65 @@
+apiVersion: filter.plainsight.ai/v1alpha1
+kind: Pipeline
+metadata:
+  name: pipeline-rtsp-event-sink
+spec:
+  # Stream mode: processes RTSP streams using a Deployment
+  mode: stream
+  source:
+    rtsp:
+      host: rtsp-video-stream
+      port: 8554
+      path: /stream
+      # credentialsSecret:
+      #   name: axis-rtsp-credentials
+  services:
+    - name: webvis
+      port: 8080
+      targetPort: 8080
+  filters:
+    - name: video-in
+      image: plainsightai/openfilter-video-in:v0.1.10
+      config:
+        # Use the injected RTSP_URL environment variable
+        # If credentialsSecret is configured, credentials are already embedded in the URL
+        - name: sources
+          value: "$(RTSP_URL)"
+        - name: outputs
+          value: tcp://*:5550
+    - name: face-blur
+      image: plainsightai/openfilter-faceblur:v1.1.4
+      config:
+        - name: sources
+          value: tcp://localhost:5550
+        - name: outputs
+          value: tcp://*:5552
+        - name: debug
+          value: "true"
+        - name: mq_log
+          value: pretty
+    - name: event-sink
+      image: plainsightai/openfilter-event-sink:v1.0.1
+      config:
+        - name: sources
+          value: "tcp://localhost:5550??;>VideoIn,tcp://localhost:5552??;>FaceBlur"
+        - name: mq_log
+          value: pretty
+        - name: api_endpoint
+          value: "https://api.prod.plainsight.tech/filter-pipelines/pipeline-demo/events?project=20000000-0000-0000-0000-000000000008"
+        - name: api_custom_headers
+          value: "X-Scope-OrgID: 48eec17d-3089-4d13-a107-24f5f4cf84c7"
+      env:
+        - name: FILTER_API_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: plainsight-api-token
+              key: token
+    - name: webvis
+      image: plainsightai/openfilter-webvis:v0.1.10
+      config:
+        - name: sources
+          value: tcp://localhost:5552
+        - name: host
+          value: "0.0.0.0"
+        - name: port
+          value: "8080"
