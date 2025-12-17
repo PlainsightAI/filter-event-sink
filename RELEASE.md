@@ -3,6 +3,10 @@ Event Sink filter release notes
 
 ## [Unreleased]
 
+## v1.0.2 - 2025-12-17
+
+### Fixed
+- Docker image build
 
 ## v1.0.1 - 2025-11-11
 

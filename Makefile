@@ -29,7 +29,7 @@ PIPELINE := \
 		--sources 'tcp://localhost:5550' \
 		--port 8001
 
-IMAGE ?= containers.openfilter.io/plainsightai/openfilter-event-sink
+IMAGE ?= plainsightai/openfilter-event-sink
 PYPI_REPO ?= https://python.openfilter.io/simple/
 VERSION ?= $(shell cat VERSION)
 CONTAINER_EXEC := docker

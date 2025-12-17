@@ -25,16 +25,19 @@ class TestFilterIntegration(unittest.TestCase):
     @responses.activate
     def test_end_to_end_flow(self):
         """Test complete flow from frame to API post"""
+        # Allow openfilter's Scarf telemetry requests to pass through
+        responses.add_passthru("https://python.openfilter.io")
+
         responses.add(
             responses.POST,
-            'https://api.example.com/filter-pipelines/test/events',
+            "https://api.example.com/filter-pipelines/test/events",
             status=202,
         )
 
         config = FilterEventSinkConfig(
-            api_endpoint='https://api.example.com/filter-pipelines/test/events',
-            api_token='ps_test',
-            pipeline_id='test-pipeline-id',
+            api_endpoint="https://api.example.com/filter-pipelines/test/events",
+            api_token="ps_test",
+            pipeline_id="test-pipeline-id",
             flush_interval_seconds=0.5,  # Fast flush for testing
         )
 
@@ -47,14 +50,14 @@ class TestFilterIntegration(unittest.TestCase):
             # Process frame with events (using new topic pattern)
             frame = Frame(
                 data={
-                    'detections': [
-                        {'type': 'detection', 'class': 'person'},
-                        {'type': 'detection', 'class': 'vehicle'},
+                    "detections": [
+                        {"type": "detection", "class": "person"},
+                        {"type": "detection", "class": "vehicle"},
                     ],
-                    'count': 2,
+                    "count": 2,
                 }
             )
-            frames = {'ObjectDetector__detections': frame}
+            frames = {"ObjectDetector__detections": frame}
 
             result = filter_instance.process(frames)
 
@@ -73,16 +76,16 @@ class TestFilterIntegration(unittest.TestCase):
 
             # Verify payload
             request = responses.calls[0].request
-            if request.headers.get('Content-Encoding') == 'gzip':
+            if request.headers.get("Content-Encoding") == "gzip":
                 payload = gzip.decompress(request.body)
             else:
                 payload = request.body
 
             events = json.loads(payload)
             self.assertEqual(len(events), 1)
-            self.assertEqual(events[0]['pipelineid'], 'test-pipeline-id')
-            self.assertEqual(events[0]['filtername'], 'ObjectDetector')
-            self.assertEqual(events[0]['filtertopic'], 'detections')
+            self.assertEqual(events[0]["pipelineid"], "test-pipeline-id")
+            self.assertEqual(events[0]["filtername"], "ObjectDetector")
+            self.assertEqual(events[0]["filtertopic"], "detections")
 
         finally:
             filter_instance.shutdown()
@@ -90,9 +93,9 @@ class TestFilterIntegration(unittest.TestCase):
     def test_output_filter_returns_none(self):
         """Test that output filter returns None"""
         config = FilterEventSinkConfig(
-            api_endpoint='https://api.example.com',
-            api_token='ps_test',
-            pipeline_id='test-pipeline-id',
+            api_endpoint="https://api.example.com",
+            api_token="ps_test",
+            pipeline_id="test-pipeline-id",
         )
 
         filter_instance = FilterEventSink(config)
@@ -103,8 +106,8 @@ class TestFilterIntegration(unittest.TestCase):
         try:
             # Create frame with image
             image = np.zeros((100, 100, 3), dtype=np.uint8)
-            frame = Frame(image=image, data={'test': 'data'}, format='BGR')
-            frames = {'TestFilter__main': frame}
+            frame = Frame(image=image, data={"test": "data"}, format="BGR")
+            frames = {"TestFilter__main": frame}
 
             result = filter_instance.process(frames)
 
@@ -116,10 +119,10 @@ class TestFilterIntegration(unittest.TestCase):
 
 
 try:
-    multiprocessing.set_start_method('spawn')  # CUDA doesn't like fork()
+    multiprocessing.set_start_method("spawn")  # CUDA doesn't like fork()
 except Exception:
     pass
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
