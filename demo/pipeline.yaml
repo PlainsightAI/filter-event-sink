@@ -38,7 +38,7 @@ spec:
         - name: mq_log
           value: pretty
     - name: event-sink
-      image: containers.openfilter.io/plainsightai/openfilter-event-sink:v1.0.2
+      image: containers.openfilter.io/plainsightai/openfilter-event-sink:v1.0.3
       config:
         - name: sources
           value: "tcp://localhost:5550??;>VideoIn,tcp://localhost:5552??;>FaceBlur"

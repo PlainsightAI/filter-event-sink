@@ -16,10 +16,10 @@ jobs:
         python: ["3.10", "3.11", "3.12", "3.13"]
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python }}
 
@@ -38,7 +38,7 @@ jobs:
     if: github.event_name == 'workflow_dispatch'
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Run changelog parser
         id: changelog
@@ -73,7 +73,7 @@ jobs:
         shell: bash
 
       - name: Checking Tag (${{ env.CHANGELOG_VERSION }})
-        uses: mukunku/tag-exists-action@v1.6.0
+        uses: mukunku/tag-exists-action@v1.7.0
         id: check_tag
         with:
           tag: "${{ env.CHANGELOG_VERSION }}"
@@ -112,13 +112,13 @@ jobs:
       already_exists: ${{ steps.check_pypi.outputs.already_exists }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Write Git SHA to VERSION_SHA
         run: echo "${{ github.sha }}" > VERSION_SHA
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.11"
 
@@ -188,7 +188,7 @@ jobs:
           echo "✅ Package inspection complete."
 
       - name: Upload wheel artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: wheel-dist
           path: dist/
@@ -202,10 +202,10 @@ jobs:
       url: https://pypi.org/project/${{ needs.prepare-pypi-publish.outputs.package_name }}/
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.11"
 
@@ -213,7 +213,7 @@ jobs:
         run: pip install twine
 
       - name: Download wheel artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: wheel-dist
           path: dist/
@@ -261,10 +261,10 @@ jobs:
 
   publish-docker:
     runs-on: ubuntu-latest
-    needs: publish-to-pypi
+    needs: [prepare-pypi-publish, publish-to-pypi]
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Publish to Docker Hub
         uses: PlainsightAI/gh-actions/publish-dockerhub@main
