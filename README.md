@@ -162,7 +162,7 @@ make test-coverage
 ```yaml
 services:
   filter_event_sink:
-    image: plainsightai/openfilter-event-sink:v1.0.1
+    image: containers.openfilter.io/plainsightai/openfilter-event-sink:v1.0.2
     environment:
       LOG_LEVEL: INFO
       FILTER_ID: EventSink

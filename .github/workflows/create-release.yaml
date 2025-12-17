@@ -102,7 +102,6 @@ jobs:
           fi
           echo "version=${{ env.CHANGELOG_VERSION }}" >> $GITHUB_OUTPUT
 
-
   prepare-pypi-publish:
     runs-on: ubuntu-latest
     needs: create-release
@@ -270,5 +269,6 @@ jobs:
       - name: Publish to Docker Hub
         uses: PlainsightAI/gh-actions/publish-dockerhub@main
         with:
-            image-name: containers.openfilter.io/plainsightai/openfilter-event-sink
-            tags: ${{ needs.prepare-pypi-publish.outputs.package_version }},latest
+          image-name: plainsightai/openfilter-event-sink
+          tags: ${{ needs.prepare-pypi-publish.outputs.package_version }},latest
+          dockerhub-access-token: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
