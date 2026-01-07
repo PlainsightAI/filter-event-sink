@@ -129,5 +129,91 @@ class TestCloudEventBuilding(unittest.TestCase):
         )
 
 
+class TestCloudEventFrameId(unittest.TestCase):
+    """Test frame ID extension field in CloudEvents (TI-130)"""
+
+    def test_frame_id_promoted_to_extension(self):
+        """Test that frame id from data is promoted to extension field"""
+        event = {
+            'filter_name': 'TestFilter',
+            'topic': 'events',
+            'data': {'id': 42, 'class': 'person'},
+        }
+
+        cloudevent = build_cloudevent(
+            event=event,
+            pipeline_id='test-pipeline-id',
+            event_source_base='filter://',
+        )
+
+        self.assertEqual(cloudevent['frameid'], 42)
+        # id should also remain in data
+        self.assertEqual(cloudevent['data']['id'], 42)
+
+    def test_frame_id_array_promoted(self):
+        """Test that array of frame IDs is promoted to extension"""
+        event = {
+            'filter_name': 'TestFilter',
+            'topic': 'events',
+            'data': {'id': [1, 2, 3], 'class': 'person'},
+        }
+
+        cloudevent = build_cloudevent(
+            event=event,
+            pipeline_id='test-pipeline-id',
+            event_source_base='filter://',
+        )
+
+        self.assertEqual(cloudevent['frameid'], [1, 2, 3])
+
+    def test_no_frame_id_no_extension(self):
+        """Test that frameid extension is absent when no id in data"""
+        event = {
+            'filter_name': 'TestFilter',
+            'topic': 'events',
+            'data': {'class': 'person'},
+        }
+
+        cloudevent = build_cloudevent(
+            event=event,
+            pipeline_id='test-pipeline-id',
+            event_source_base='filter://',
+        )
+
+        self.assertNotIn('frameid', cloudevent)
+
+    def test_non_dict_data_no_frame_id(self):
+        """Test that non-dict data doesn't cause errors"""
+        event = {
+            'filter_name': 'TestFilter',
+            'topic': 'events',
+            'data': 'string data',
+        }
+
+        cloudevent = build_cloudevent(
+            event=event,
+            pipeline_id='test-pipeline-id',
+            event_source_base='filter://',
+        )
+
+        self.assertNotIn('frameid', cloudevent)
+
+    def test_frame_id_zero_is_valid(self):
+        """Test that frame id of 0 is still promoted"""
+        event = {
+            'filter_name': 'TestFilter',
+            'topic': 'events',
+            'data': {'id': 0, 'class': 'person'},
+        }
+
+        cloudevent = build_cloudevent(
+            event=event,
+            pipeline_id='test-pipeline-id',
+            event_source_base='filter://',
+        )
+
+        self.assertEqual(cloudevent['frameid'], 0)
+
+
 if __name__ == '__main__':
     unittest.main()

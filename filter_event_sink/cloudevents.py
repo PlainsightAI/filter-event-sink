@@ -33,6 +33,12 @@ def build_cloudevent(
     # Get timestamp
     timestamp = datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
 
+    # Extract data and frame id (TI-130: promote id to extension field)
+    data = event.get('data', {})
+    frame_id = None
+    if isinstance(data, dict):
+        frame_id = data.get('id')
+
     # Build CloudEvent
     cloudevent = {
         # Required CloudEvents v1.0 fields
@@ -43,11 +49,15 @@ def build_cloudevent(
         'time': timestamp,
         # Optional CloudEvents fields
         'datacontenttype': 'application/json',
-        'data': event.get('data', {}),
+        'data': data,
         # Required Plainsight extensions
         'pipelineid': pipeline_id,
         'filtername': event.get('filter_name'),
         'filtertopic': event.get('topic'),
     }
+
+    # Add frame id as extension field if present (TI-130)
+    if frame_id is not None:
+        cloudevent['frameid'] = frame_id
 
     return cloudevent
