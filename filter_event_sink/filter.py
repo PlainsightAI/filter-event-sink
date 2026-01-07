@@ -108,9 +108,9 @@ class FilterEventSink(Filter):
                     if frame_id is not None:
                         filter_metadata['id'] = frame_id
                         logger.debug(f"Extracted frame id from {topic}: {frame_id}")
-                    # Preserve any other fields from _filter
+                    # Preserve any other fields from _filter (skip None values)
                     for key, value in frame.data.items():
-                        if key not in filter_metadata:
+                        if key not in filter_metadata and value is not None:
                             filter_metadata[key] = value
                 break  # Only use first _filter topic found
 
