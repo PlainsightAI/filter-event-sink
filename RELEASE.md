@@ -3,6 +3,19 @@ Event Sink filter release notes
 
 ## [Unreleased]
 
+## v1.1.0 - 2026-01-14
+
+### Changed
+- Updated demo pipeline for openfilter-pipelines-controller v0.2.0
+- Updated security scan workflow
+
+### Added
+- Extract frame ID from _filter topic and attach to events
+
+### Fixed
+- Fix workflow dependencies (publish-to-pypi -> publish-docker)
+- docker push in create release workflow
+
 ## v1.0.3 - 2025-12-17
 
 ### Fixed

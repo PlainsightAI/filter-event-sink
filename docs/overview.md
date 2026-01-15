@@ -124,7 +124,7 @@ The filter logs:
 ```yaml
 services:
   event_sink:
-    image: containers.openfilter.io/plainsightai/openfilter-event-sink:v1.0.3
+    image: containers.openfilter.io/plainsightai/openfilter-event-sink:v1.1.0
     environment:
       LOG_LEVEL: INFO
       FILTER_ID: EventSink

@@ -1,0 +1,9 @@
+apiVersion: filter.plainsight.ai/v1alpha1
+kind: PipelineInstance
+metadata:
+  name: pipelineinstance-rtsp-event-sink
+spec:
+  pipelineRef:
+    name: pipeline-rtsp-event-sink
+  sourceRef:
+    name: pipelinesource-rtsp-event-sink
