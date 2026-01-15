@@ -1,6 +1,6 @@
 # Event Sink Filter Pipeline Demo
 
-This demo shows how to use the `filter-event-sink` in an OpenFilter pipeline with the [openfilter-pipelines-controller](https://github.com/PlainsightAI/openfilter-pipelines-controller).
+This demo shows how to use the `filter-event-sink` in an OpenFilter pipeline with the [openfilter-pipelines-controller](https://github.com/PlainsightAI/openfilter-pipelines-controller) v0.2.0+.
 
 ## Overview
 
@@ -12,7 +12,7 @@ This pipeline example demonstrates:
 
 ## Prerequisites
 
-1. **Kubernetes cluster** with the [openfilter-pipelines-controller](https://github.com/PlainsightAI/openfilter-pipelines-controller) installed
+1. **Kubernetes cluster** with the [openfilter-pipelines-controller](https://github.com/PlainsightAI/openfilter-pipelines-controller) v0.2.0+ installed
 2. **Plainsight API token** for authentication
 3. **RTSP video source** (the example uses `rtsp-video-stream:8554/stream`)
 
@@ -34,37 +34,45 @@ kubectl create secret generic -n pipeline-demo plainsight-api-token --from-liter
 
 Replace `<your_token>` with your actual Plainsight API token.
 
-### 3. Update Pipeline Configuration (Optional)
+### 3. Update Configuration (Optional)
 
-Edit [pipeline.yaml](pipeline.yaml) if you need to customize:
+**Edit [pipelinesource.yaml](pipelinesource.yaml)** if you need to customize:
+- **RTSP source** (lines 6-9): Update the host, port, and path for your video source
+- **RTSP credentials** (lines 10-11): Uncomment and configure if your stream requires authentication
 
-- **RTSP source** (lines 10-12): Update the host, port, and path for your video source
-- **API endpoint** (line 48): Update the endpoint URL for your project
-- **API custom headers** (line 50): Update the X-Scope-OrgID header with your organization ID
+**Edit [pipeline.yaml](pipeline.yaml)** if you need to customize:
+- **API endpoint** (line 42): Update the endpoint URL for your project
+- **API custom headers** (line 44): Update the X-Scope-OrgID header with your organization ID
 
-### 4. Deploy the Pipeline
+### 4. Deploy the Resources
 
-Apply the pipeline definition:
+Apply the resources in order:
 
 ```bash
+# Apply the pipeline definition (filter recipe)
 kubectl apply -f pipeline.yaml -n pipeline-demo
+
+# Apply the pipeline source (RTSP configuration)
+kubectl apply -f pipelinesource.yaml -n pipeline-demo
+
+# Create a pipeline instance to execute the pipeline
+kubectl apply -f pipelineinstance.yaml -n pipeline-demo
 ```
 
-### 5. Create a Pipeline Run
-
-Create a pipeline run to execute the pipeline:
+Or apply all at once:
 
 ```bash
-kubectl apply -f pipelinerun.yaml -n pipeline-demo
+kubectl apply -f . -n pipeline-demo
 ```
 
 ## Monitoring
 
-### Check Pipeline Status
+### Check Resource Status
 
 ```bash
 kubectl get pipelines -n pipeline-demo
-kubectl get pipelineruns -n pipeline-demo
+kubectl get pipelinesources -n pipeline-demo
+kubectl get pipelineinstances -n pipeline-demo
 ```
 
 ### View Logs
@@ -101,9 +109,9 @@ Then open http://localhost:8080 in your browser.
 ## Pipeline Architecture
 
 ```
-RTSP Source → video-in → face-blur → webvis
-                  ↓           ↓
-                  └─── event-sink ───→ Plainsight API
+RTSP Source -> video-in -> face-blur -> webvis
+                  |           |
+                  +--- event-sink ---> Plainsight API
 ```
 
 The event sink filter:
@@ -112,13 +120,35 @@ The event sink filter:
 - Sends events to the configured Plainsight API endpoint
 - Uses the API token from the Kubernetes secret for authentication
 
+## Resource Structure (v0.2.0)
+
+The openfilter-pipelines-controller v0.2.0 introduces a separation of concerns:
+
+- **Pipeline** (`pipeline.yaml`): Defines the filter recipe (reusable)
+- **PipelineSource** (`pipelinesource.yaml`): Defines the input source configuration (reusable)
+- **PipelineInstance** (`pipelineinstance.yaml`): Executes a Pipeline with a specific PipelineSource
+
+This allows you to:
+- Reuse the same Pipeline with different sources
+- Reuse the same source with different Pipelines
+- Create multiple instances of the same Pipeline+Source combination
+
 ## Cleanup
 
 To remove the pipeline and all associated resources:
 
 ```bash
-kubectl delete -f pipelinerun.yaml -n pipeline-demo
+kubectl delete -f pipelineinstance.yaml -n pipeline-demo
+kubectl delete -f pipelinesource.yaml -n pipeline-demo
 kubectl delete -f pipeline.yaml -n pipeline-demo
+kubectl delete secret plainsight-api-token -n pipeline-demo
+kubectl delete namespace pipeline-demo
+```
+
+Or delete all at once:
+
+```bash
+kubectl delete -f . -n pipeline-demo
 kubectl delete secret plainsight-api-token -n pipeline-demo
 kubectl delete namespace pipeline-demo
 ```
@@ -139,4 +169,10 @@ Verify the secret exists and contains the correct token:
 
 ```bash
 kubectl get secret plainsight-api-token -n pipeline-demo -o yaml
+```
+
+### Check PipelineInstance Status
+
+```bash
+kubectl describe pipelineinstance pipelineinstance-rtsp-event-sink -n pipeline-demo
 ```
