@@ -1,6 +1,6 @@
 services:
   video_in:
-    image: containers.openfilter.io/plainsightai/openfilter-video-in:v0.1.10
+    image: containers.openfilter.io/plainsightai/openfilter-video-in:0.1.18
     platform: linux/amd64
     environment:
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
@@ -13,7 +13,7 @@ services:
       - filter-network
 
   filter_event_sink:
-    image: containers.openfilter.io/plainsightai/openfilter-event-sink:v1.1.0
+    image: containers.openfilter.io/plainsightai/openfilter-event-sink:1.1.1
     platform: linux/amd64
     environment:
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
@@ -37,7 +37,7 @@ services:
       - filter-network
 
   webvis:
-    image: us-west1-docker.pkg.dev/plainsightai-prod/oci/openfilter/webvis:v0.1.9
+    image: containers.openfilter.io/plainsightai/openfilter-webvis:0.1.18
     platform: linux/amd64
     environment:
       LOG_LEVEL: ${LOG_LEVEL:-INFO}

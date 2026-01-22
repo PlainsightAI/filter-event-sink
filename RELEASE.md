@@ -3,6 +3,12 @@ Event Sink filter release notes
 
 ## [Unreleased]
 
+## v1.1.1 - 2026-01-21
+
+### Fixed
+- updated dependencies to latest versions
+- CVE: update `opencv-python-headless` to 4.13.0 (fixes ffmpeg security vulnerability) (OpenFilter dependency update)
+
 ## v1.1.0 - 2026-01-14
 
 ### Changed
