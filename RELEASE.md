@@ -3,6 +3,13 @@ Event Sink filter release notes
 
 ## [Unreleased]
 
+## v1.1.2 - 2026-01-23
+
+### Added
+- Promote `pipeline_instance_id` from `_filter` topic to CloudEvents `pipelineinstanceid` extension field
+  - Enables correlation of events across pipeline instances
+  - Follows same pattern as `frameid` extraction
+
 ## v1.1.1 - 2026-01-21
 
 ### Fixed
