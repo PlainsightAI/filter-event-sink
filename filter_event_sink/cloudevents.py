@@ -60,4 +60,11 @@ def build_cloudevent(
     if frame_id is not None:
         cloudevent['frameid'] = frame_id
 
+    # Add pipeline instance id as extension field if present
+    # This is the runtime-assigned instance ID from the _filter topic
+    if isinstance(data, dict):
+        pipeline_instance_id = data.get('pipeline_instance_id')
+        if pipeline_instance_id is not None:
+            cloudevent['pipelineinstanceid'] = pipeline_instance_id
+
     return cloudevent

@@ -251,6 +251,34 @@ class TestFrameIdExtraction(unittest.TestCase):
         self.assertEqual(events[0]['data']['id'], 42)
         self.assertEqual(events[0]['data']['extra_field'], 'value')
 
+    def test_pipeline_instance_id_extracted_from_filter_topic(self):
+        """Test that pipeline_instance_id is extracted from _filter topic"""
+        frames = {
+            '_filter': Frame(data={'id': 42, 'pipeline_instance_id': 'run-20251027-abc123'}),
+            'Detector__events': Frame(data={'class': 'person'}),
+        }
+
+        events = self.filter._extract_events(frames)
+
+        self.assertEqual(len(events), 1)
+        self.assertEqual(events[0]['data']['id'], 42)
+        self.assertEqual(events[0]['data']['pipeline_instance_id'], 'run-20251027-abc123')
+
+    def test_pipeline_instance_id_attached_to_all_events(self):
+        """Test that pipeline_instance_id is attached to all events from same frame batch"""
+        frames = {
+            '_filter': Frame(data={'id': 99, 'pipeline_instance_id': 'run-xyz'}),
+            'Detector1__events': Frame(data={'class': 'person'}),
+            'Detector2__alerts': Frame(data={'level': 'high'}),
+        }
+        self.filter.config.event_topics = ['*']
+
+        events = self.filter._extract_events(frames)
+
+        self.assertEqual(len(events), 2)
+        for event in events:
+            self.assertEqual(event['data']['pipeline_instance_id'], 'run-xyz')
+
     def test_non_hidden_filter_topic_processed(self):
         """Test that non-hidden topic named 'filter' is processed as event"""
         frames = {

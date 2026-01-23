@@ -215,5 +215,96 @@ class TestCloudEventFrameId(unittest.TestCase):
         self.assertEqual(cloudevent['frameid'], 0)
 
 
+class TestCloudEventPipelineInstanceId(unittest.TestCase):
+    """Test pipeline instance ID extension field in CloudEvents"""
+
+    def test_pipeline_instance_id_promoted_to_extension(self):
+        """Test that pipeline_instance_id from data is promoted to extension field"""
+        event = {
+            'filter_name': 'TestFilter',
+            'topic': 'events',
+            'data': {'pipeline_instance_id': 'run-20251027-abc123', 'class': 'person'},
+        }
+
+        cloudevent = build_cloudevent(
+            event=event,
+            pipeline_id='test-pipeline-id',
+            event_source_base='filter://',
+        )
+
+        self.assertEqual(cloudevent['pipelineinstanceid'], 'run-20251027-abc123')
+        # pipeline_instance_id should also remain in data
+        self.assertEqual(cloudevent['data']['pipeline_instance_id'], 'run-20251027-abc123')
+
+    def test_no_pipeline_instance_id_no_extension(self):
+        """Test that pipelineinstanceid extension is absent when not in data"""
+        event = {
+            'filter_name': 'TestFilter',
+            'topic': 'events',
+            'data': {'class': 'person'},
+        }
+
+        cloudevent = build_cloudevent(
+            event=event,
+            pipeline_id='test-pipeline-id',
+            event_source_base='filter://',
+        )
+
+        self.assertNotIn('pipelineinstanceid', cloudevent)
+
+    def test_pipeline_instance_id_uuid_format(self):
+        """Test that UUID pipeline_instance_id is promoted"""
+        event = {
+            'filter_name': 'TestFilter',
+            'topic': 'events',
+            'data': {'pipeline_instance_id': '550e8400-e29b-41d4-a716-446655440000'},
+        }
+
+        cloudevent = build_cloudevent(
+            event=event,
+            pipeline_id='test-pipeline-id',
+            event_source_base='filter://',
+        )
+
+        self.assertEqual(cloudevent['pipelineinstanceid'], '550e8400-e29b-41d4-a716-446655440000')
+
+    def test_pipeline_instance_id_with_frame_id(self):
+        """Test that both pipeline_instance_id and frame_id are promoted"""
+        event = {
+            'filter_name': 'TestFilter',
+            'topic': 'events',
+            'data': {
+                'id': 42,
+                'pipeline_instance_id': 'run-123',
+                'class': 'person',
+            },
+        }
+
+        cloudevent = build_cloudevent(
+            event=event,
+            pipeline_id='test-pipeline-id',
+            event_source_base='filter://',
+        )
+
+        self.assertEqual(cloudevent['frameid'], 42)
+        self.assertEqual(cloudevent['pipelineinstanceid'], 'run-123')
+
+    def test_non_dict_data_no_pipeline_instance_id(self):
+        """Test that non-dict data doesn't cause errors for pipeline_instance_id"""
+        event = {
+            'filter_name': 'TestFilter',
+            'topic': 'events',
+            'data': 'string data',
+        }
+
+        cloudevent = build_cloudevent(
+            event=event,
+            pipeline_id='test-pipeline-id',
+            event_source_base='filter://',
+        )
+
+        self.assertNotIn('pipelineinstanceid', cloudevent)
+
+
 if __name__ == '__main__':
     unittest.main()
