@@ -11,7 +11,7 @@ spec:
       targetPort: 8080
   filters:
     - name: video-in
-      image: containers.openfilter.io/plainsightai/openfilter-video-in:0.1.18
+      image: containers.openfilter.io/plainsightai/openfilter-video-in:0.1.20
       config:
         # Use the injected RTSP_URL environment variable
         # If credentialsSecret is configured, credentials are already embedded in the URL
@@ -31,7 +31,7 @@ spec:
         - name: mq_log
           value: pretty
     - name: event-sink
-      image: containers.openfilter.io/plainsightai/openfilter-event-sink:1.1.1
+      image: containers.openfilter.io/plainsightai/openfilter-event-sink:1.1.2
       config:
         - name: sources
           value: "tcp://localhost:5550??;>VideoIn,tcp://localhost:5552??;>FaceBlur"
@@ -48,7 +48,7 @@ spec:
               name: plainsight-api-token
               key: token
     - name: webvis
-      image: containers.openfilter.io/plainsightai/openfilter-webvis:0.1.18
+      image: containers.openfilter.io/plainsightai/openfilter-webvis:0.1.20
       config:
         - name: sources
           value: tcp://localhost:5552
