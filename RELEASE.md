@@ -3,6 +3,13 @@ Event Sink filter release notes
 
 ## [Unreleased]
 
+## v1.1.2 - 2026-01-28
+
+### Fixed
+- Add missing X11/OpenCV runtime libraries to Dockerfile
+  - Fixes `ImportError: libxcb.so.1 cannot open shared object file`
+- Update openfilter dependency to 0.1.20
+
 ## v1.1.1 - 2026-01-21
 
 ### Fixed
