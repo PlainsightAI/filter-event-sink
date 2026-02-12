@@ -3,6 +3,9 @@ Event Sink filter release notes
 
 ## [Unreleased]
 
+### Changed
+- Relax openfilter version constraint from exact pin to `~=0.1.0` for cascade rebuild compatibility
+
 ## v1.1.2 - 2026-01-28
 
 ### Fixed
