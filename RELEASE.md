@@ -6,7 +6,7 @@ Event Sink filter release notes
 ## v1.1.3 - 2026-03-11
 
 ### Fixed
-- Relax source validation: sources without doubly ephemeral (`??`) or topic remapping (`>`) now log warnings instead of raising `ValueError`, allowing the filter to start in environments where the pipeline export does not generate the recommended source format
+- Relax source validation: sources without doubly ephemeral (`??`) now log a warning instead of raising `ValueError`, allowing the filter to start in environments where the pipeline export does not yet generate the recommended source format
 
 ### Changed
 - Standardize build path to match public openfilter filters (from v1.1.2)

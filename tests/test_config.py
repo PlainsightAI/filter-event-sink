@@ -168,18 +168,28 @@ class TestFilterEventSinkConfig(unittest.TestCase):
             api_token='ps_test',
             pipeline_id='test-pipeline-id',
         )
-        config.sources = ['tcp://localhost:5550']
+        config.sources = ['tcp://localhost:5550;main>VideoIn']
 
         with self.assertLogs('filter_event_sink.config', level='WARNING') as log:
             normalized = FilterEventSink.normalize_config(config)
             self.assertTrue(
                 any('doubly ephemeral' in msg for msg in log.output)
             )
-            self.assertTrue(
-                any('does not remap' in msg for msg in log.output)
-            )
         # Should NOT raise - filter continues to work
         self.assertIsNotNone(normalized)
+
+    def test_source_without_remap_raises(self):
+        """Test that source without > still raises ValueError"""
+        config = FilterEventSinkConfig(
+            api_endpoint='https://api.example.com',
+            api_token='ps_test',
+            pipeline_id='test-pipeline-id',
+        )
+        config.sources = ['tcp://localhost:5550??']
+
+        with self.assertRaises(ValueError) as ctx:
+            FilterEventSink.normalize_config(config)
+        self.assertIn('does not remap', str(ctx.exception))
 
     def test_source_with_ephemeral_no_warning(self):
         """Test that properly formatted source does not warn"""
