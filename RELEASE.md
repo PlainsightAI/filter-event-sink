@@ -3,8 +3,14 @@ Event Sink filter release notes
 
 ## [Unreleased]
 
+## v1.1.3 - 2026-03-11
+
+### Fixed
+- Relax source validation: sources without doubly ephemeral (`??`) or topic remapping (`>`) now log warnings instead of raising `ValueError`, allowing the filter to start in environments where the pipeline export does not generate the recommended source format
+
 ### Changed
-- Relax openfilter version constraint from exact pin to `~=0.1.0` for cascade rebuild compatibility
+- Standardize build path to match public openfilter filters (from v1.1.2)
+- Relax openfilter version constraint to `~=0.1.0` (from v1.1.2)
 
 ## v1.1.2 - 2026-01-28
 
