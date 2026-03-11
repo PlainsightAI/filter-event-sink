@@ -122,15 +122,17 @@ class FilterEventSinkConfig(FilterConfig):
             )
             config.gzip_compression_level = 6
 
-        # validate sources
+        # warn if sources don't use recommended format (previously hard error)
         for source in config.sources or []:
-            # validate that all sources use doubly ephemeral source identifier (??)
             if '??' not in source:
-                raise ValueError(
-                    f"Source {source} does not use doubly ephemeral source identifier"
+                logger.warning(
+                    f"Source {source} does not use doubly ephemeral source identifier (??). "
+                    f"Recommended for transient pipeline connections."
                 )
-            # validates that all sources remaps the topic
             if '>' not in source:
-                raise ValueError(f"Source {source} does not remap the topic")
+                logger.warning(
+                    f"Source {source} does not remap the topic (>). "
+                    f"Recommended format: tcp://host:port??;>TopicName"
+                )
 
         return config
