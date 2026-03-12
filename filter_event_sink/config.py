@@ -124,10 +124,10 @@ class FilterEventSinkConfig(FilterConfig):
 
         # validate sources
         for source in config.sources or []:
-            # validate that all sources use doubly ephemeral source identifier (??)
             if '??' not in source:
-                raise ValueError(
-                    f"Source {source} does not use doubly ephemeral source identifier"
+                logger.warning(
+                    f"Source {source} does not use doubly ephemeral source identifier (??). "
+                    "Recommended for transient pipeline connections."
                 )
             # validates that all sources remaps the topic
             if '>' not in source:
