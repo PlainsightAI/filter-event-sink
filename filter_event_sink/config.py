@@ -127,7 +127,7 @@ class FilterEventSinkConfig(FilterConfig):
             if '??' not in source:
                 logger.warning(
                     f"Source {source} does not use doubly ephemeral source identifier (??). "
-                    f"Recommended for transient pipeline connections."
+                    "Recommended for transient pipeline connections."
                 )
             # validates that all sources remaps the topic
             if '>' not in source:

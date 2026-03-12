@@ -201,7 +201,8 @@ class TestFilterEventSinkConfig(unittest.TestCase):
         config.sources = ['tcp://upstream:5550??;>VideoIn']
 
         # No warnings expected for properly formatted sources
-        normalized = FilterEventSink.normalize_config(config)
+        with self.assertNoLogs('filter_event_sink.config', level='WARNING'):
+            normalized = FilterEventSink.normalize_config(config)
         self.assertIsNotNone(normalized)
 
 
