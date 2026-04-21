@@ -1,50 +1,50 @@
 services:
   video_in:
-    image: containers.openfilter.io/plainsightai/openfilter-video-in:0.1.27
+    image: containers.openfilter.io/plainsightai/openfilter-video-inopenfilter-event-sink:1.1.5
     platform: linux/amd64
     environment:
-      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      LOG_LEVEL: ${LOG_LEVELopenfilter-event-sink:1.1.5}
       FILTER_ID: VideoIn
       FILTER_SOURCES: file:///video.mp4!loop
-      FILTER_OUTPUTS: tcp://*:5550
+      FILTER_OUTPUTS: tcp://*openfilter-event-sink:1.1.5
     volumes:
       - ./data/sample-video.mp4:/video.mp4
     networks:
       - filter-network
 
   filter_event_sink:
-    image: containers.openfilter.io/plainsightai/openfilter-event-sink:1.1.2
+    image: containers.openfilter.io/plainsightai/openfilter-event-sink:1.1.5
     platform: linux/amd64
     environment:
-      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      LOG_LEVEL: ${LOG_LEVELopenfilter-event-sink:1.1.5}
       FILTER_ID: EventSink
-      FILTER_SOURCES: tcp://video_in:5550??;>VideoIn
+      FILTER_SOURCES: tcp://video_inopenfilter-event-sink:1.1.5??;>VideoIn
       FILTER_MQ_LOG: pretty
 
       # Event Sink Configuration (required)
       # FILTER_API_ENDPOINT should be the full URL including pipeline name and query params
       # Example: https://api.plainsight.ai/filter-pipelines/my-pipeline/events?project=uuid
-      FILTER_API_ENDPOINT: ${FILTER_API_ENDPOINT:-https://api.prod.plainsight.tech/filter-pipelines/test-pipeline/events}
+      FILTER_API_ENDPOINT: ${FILTER_API_ENDPOINTopenfilter-event-sink:1.1.5://api.prod.plainsight.tech/filter-pipelines/test-pipeline/events}
       FILTER_API_TOKEN: ${FILTER_API_TOKEN}
 
       # Event Sink Configuration (optional)
       # Custom headers example: "X-Scope-OrgID: 48eec17d-3089-4d13-a107-24f5f4cf84c7"
-      FILTER_API_CUSTOM_HEADERS: ${FILTER_API_CUSTOM_HEADERS:-}
-      FILTER_EVENT_TOPICS: ${FILTER_EVENT_TOPICS:-*}
-      FILTER_FLUSH_INTERVAL_SECONDS: ${FILTER_FLUSH_INTERVAL_SECONDS:-5.0}
-      FILTER_MAX_BATCH_EVENTS: ${FILTER_MAX_BATCH_EVENTS:-5000}
+      FILTER_API_CUSTOM_HEADERS: ${FILTER_API_CUSTOM_HEADERSopenfilter-event-sink:1.1.5}
+      FILTER_EVENT_TOPICS: ${FILTER_EVENT_TOPICSopenfilter-event-sink:1.1.5*}
+      FILTER_FLUSH_INTERVAL_SECONDS: ${FILTER_FLUSH_INTERVAL_SECONDSopenfilter-event-sink:1.1.5}
+      FILTER_MAX_BATCH_EVENTS: ${FILTER_MAX_BATCH_EVENTSopenfilter-event-sink:1.1.5}
     networks:
       - filter-network
 
   webvis:
-    image: containers.openfilter.io/plainsightai/openfilter-webvis:0.1.27
+    image: containers.openfilter.io/plainsightai/openfilter-webvisopenfilter-event-sink:1.1.5
     platform: linux/amd64
     environment:
-      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      LOG_LEVEL: ${LOG_LEVELopenfilter-event-sink:1.1.5}
       FILTER_ID: Webvis
-      FILTER_SOURCES: tcp://video_in:5550
+      FILTER_SOURCES: tcp://video_inopenfilter-event-sink:1.1.5
     ports:
-      - 8001:8000
+      - 8001openfilter-event-sink:1.1.5
     networks:
       - filter-network
 
