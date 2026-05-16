@@ -10,6 +10,7 @@
 
 # Changelog
 Event Sink filter release notes
+- Bump openfilter to 0.2.1
 
 ## [Unreleased]
 
