@@ -1,25 +1,23 @@
-# v1.1.6
-
-## v1.1.6 - 2026-04-23
-
-### Changed
-- Bump openfilter SDK, align CI workflow with shared release gate (source-paths)
-
-- Fix release workflow secret names: `PYPI_API_TOKEN` → `PLAINSIGHT_PYPI_TOKEN`, `DOCKERHUB_TOKEN` → `DOCKERHUB_ACCESS_TOKEN` (org-level secret names). Without this the PyPI / Docker Hub tokens resolved to empty and no package has been published since the migration.
-- Bump openfilter dependency to `>=0.1.30`.
-
 # Changelog
 Event Sink filter release notes
 
 ## [Unreleased]
 
-### Changed
+## v1.1.7 - 2026-08-04
 
-- Bump openfilter to 1.1.0
-- Bump openfilter to 1.1.1
-- Bump openfilter to 1.1.2
-- Bump the openfilter dependency to 1.2.0
-- Bump the openfilter dependency to 1.2.1
+### Changed
+- Update `openfilter[all]` to `>=1.2.1`.
+- Grant `id-token: write` in the release workflow for keyless (cosign) SBOM attestation.
+- Fix RELEASE.md header (stray H1 + duplicated `# Changelog`/`## [Unreleased]` block broke the changelog-parser).
+- Pin Docker base image to `python:3.13.14-slim`.
+- Point compose utility images at `openfilter-{video-in,webvis}:1.2.1`, and repair the compose env-var defaults/ports mangled by an earlier bad find/replace.
+- Update dev-tooling floors and switch to range pins.
+
+## v1.1.6 - 2026-04-23
+
+### Changed
+- Update the openfilter dependency to `>=0.1.30`, and align the CI workflow with the shared release gate (source-paths).
+- Fix release workflow secret names: `PYPI_API_TOKEN` → `PLAINSIGHT_PYPI_TOKEN`, `DOCKERHUB_TOKEN` → `DOCKERHUB_ACCESS_TOKEN` (org-level secret names). Without this the PyPI / Docker Hub tokens resolved to empty and no package has been published since the migration.
 
 ## v1.1.5 - 2026-04-20
 
@@ -33,7 +31,7 @@ Event Sink filter release notes
 ### Changed
 - Replace inline create-release.yaml with shared workflow caller (~13 lines)
 - Switch to shared security-scan workflow
-- Bump openfilter to >=0.1.27
+- Update openfilter to >=0.1.27
 - Secret names updated to PYPI_API_TOKEN / DOCKERHUB_TOKEN
 
 
