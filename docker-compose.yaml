@@ -13,7 +13,7 @@ services:
       - filter-network
 
   filter_event_sink:
-    image: containers.openfilter.io/plainsightai/openfilter-event-sink:1.1.7
+    image: containers.openfilter.io/plainsightai/openfilter-event-sink:1.1.8
     platform: linux/amd64
     environment:
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
