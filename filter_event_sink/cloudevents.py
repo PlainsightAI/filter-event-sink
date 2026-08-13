@@ -33,7 +33,7 @@ def build_cloudevent(
     # Get timestamp
     timestamp = datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
 
-    # Extract data, frame id (TI-130) and source uri (PLAT-1500) to promote to extensions
+    # Extract data, frame ID (TI-130) and source URI (PLAT-1500) to promote to extensions
     data = event.get('data', {})
     frame_id = None
     source_uri = None
@@ -41,9 +41,13 @@ def build_cloudevent(
         frame_id = data.get('id')
         # meta['src'] is the entry filter's source-file identity (PLAT-1498); may be
         # a real file URI (batch) or absent (streaming, or a filter that drops meta).
+        # Promote only a non-empty string: it maps to the BigQuery source_uri column
+        # (PLAT-1501), so lists/dicts/None and blank/whitespace values must not leak through.
         meta = data.get('meta')
         if isinstance(meta, dict):
-            source_uri = meta.get('src')
+            src = meta.get('src')
+            if isinstance(src, str) and src.strip():
+                source_uri = src
 
     # Build CloudEvent
     cloudevent = {

@@ -201,8 +201,18 @@ class TestCloudEventFrameId(unittest.TestCase):
         self.assertEqual(cloudevent['data']['meta']['src'], 's3://bucket/nested/path/original.mp4')
 
     def test_no_source_uri_no_extension(self):
-        """Test that sourceuri extension is absent when meta.src is missing"""
-        for data in ({'class': 'person'}, {'meta': {'ts': 1.0}}, {'meta': 'not-a-dict'}):
+        """Test that sourceuri extension is absent when meta.src is missing, None, blank,
+        or not a string (it maps to the BigQuery source_uri column, so only a non-empty
+        string is promoted)."""
+        for data in (
+            {'class': 'person'},
+            {'meta': {'ts': 1.0}},
+            {'meta': 'not-a-dict'},
+            {'meta': {'src': None}},
+            {'meta': {'src': ''}},
+            {'meta': {'src': '   '}},
+            {'meta': {'src': ['s3://x']}},
+        ):
             event = {'filter_name': 'TestFilter', 'topic': 'events', 'data': data}
             cloudevent = build_cloudevent(
                 event=event,
