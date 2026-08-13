@@ -3,6 +3,10 @@ Event Sink filter release notes
 
 ## [Unreleased]
 
+### Added
+
+- **Promote the source-file identity to a `sourceuri` CloudEvent extension (PLAT-1500).** When an incoming frame carries `data['meta']['src']` (the entry filter's source-file identity, e.g. a batch object URI stamped via `FILTER_OVERRIDE_SOURCE_URI`), `build_cloudevent` now promotes it to a `sourceuri` extension — mirroring how `frameid` is promoted. The API stores it as the queryable `events_raw.source_uri` column (PLAT-1501), enabling per-source-file attribution of batch pipeline data. Absent for streaming or filters that don't carry `meta.src`.
+
 ### Changed
 
 - Bump the openfilter dependency to 1.3.0
