@@ -183,7 +183,7 @@ class TestCloudEventFrameId(unittest.TestCase):
         self.assertNotIn('frameid', cloudevent)
 
     def test_source_uri_promoted(self):
-        """Test that data['meta']['src'] is promoted to the sourceuri extension (PLAT-1500)"""
+        """Test that data['meta']['src'] is promoted to the sourceuri extension"""
         event = {
             'filter_name': 'TestFilter',
             'topic': 'events',
@@ -202,7 +202,7 @@ class TestCloudEventFrameId(unittest.TestCase):
 
     def test_no_source_uri_no_extension(self):
         """Test that sourceuri extension is absent when meta.src is missing, None, blank,
-        or not a string (it maps to the BigQuery source_uri column, so only a non-empty
+        or not a string (it maps to a typed string column downstream, so only a non-empty
         string is promoted)."""
         for data in (
             {'class': 'person'},
