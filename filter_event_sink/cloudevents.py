@@ -33,11 +33,21 @@ def build_cloudevent(
     # Get timestamp
     timestamp = datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
 
-    # Extract data and frame id (TI-130: promote id to extension field)
+    # Extract data, frame ID (TI-130) and source URI to promote to extensions
     data = event.get('data', {})
     frame_id = None
+    source_uri = None
     if isinstance(data, dict):
         frame_id = data.get('id')
+        # meta['src'] is the entry filter's source-file identity; may be
+        # a real file URI (batch) or absent (streaming, or a filter that drops meta).
+        # Promote only a non-empty string: it maps to a typed string column downstream, so
+        # lists/dicts/None and blank/whitespace values must not leak through.
+        meta = data.get('meta')
+        if isinstance(meta, dict):
+            src = meta.get('src')
+            if isinstance(src, str) and src.strip():
+                source_uri = src
 
     # Build CloudEvent
     cloudevent = {
@@ -59,5 +69,10 @@ def build_cloudevent(
     # Add frame id as extension field if present (TI-130)
     if frame_id is not None:
         cloudevent['frameid'] = frame_id
+
+    # Promote the source-file identity to a queryable extension so a downstream consumer
+    # can store it as a typed column. Absent for streaming.
+    if source_uri is not None:
+        cloudevent['sourceuri'] = source_uri
 
     return cloudevent

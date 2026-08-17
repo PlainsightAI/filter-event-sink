@@ -182,6 +182,45 @@ class TestCloudEventFrameId(unittest.TestCase):
 
         self.assertNotIn('frameid', cloudevent)
 
+    def test_source_uri_promoted(self):
+        """Test that data['meta']['src'] is promoted to the sourceuri extension"""
+        event = {
+            'filter_name': 'TestFilter',
+            'topic': 'events',
+            'data': {'id': 7, 'meta': {'src': 's3://bucket/nested/path/original.mp4'}, 'class': 'person'},
+        }
+
+        cloudevent = build_cloudevent(
+            event=event,
+            pipeline_id='test-pipeline-id',
+            event_source_base='filter://',
+        )
+
+        self.assertEqual(cloudevent['sourceuri'], 's3://bucket/nested/path/original.mp4')
+        # meta should also remain in data
+        self.assertEqual(cloudevent['data']['meta']['src'], 's3://bucket/nested/path/original.mp4')
+
+    def test_no_source_uri_no_extension(self):
+        """Test that sourceuri extension is absent when meta.src is missing, None, blank,
+        or not a string (it maps to a typed string column downstream, so only a non-empty
+        string is promoted)."""
+        for data in (
+            {'class': 'person'},
+            {'meta': {'ts': 1.0}},
+            {'meta': 'not-a-dict'},
+            {'meta': {'src': None}},
+            {'meta': {'src': ''}},
+            {'meta': {'src': '   '}},
+            {'meta': {'src': ['s3://x']}},
+        ):
+            event = {'filter_name': 'TestFilter', 'topic': 'events', 'data': data}
+            cloudevent = build_cloudevent(
+                event=event,
+                pipeline_id='test-pipeline-id',
+                event_source_base='filter://',
+            )
+            self.assertNotIn('sourceuri', cloudevent)
+
     def test_non_dict_data_no_frame_id(self):
         """Test that non-dict data doesn't cause errors"""
         event = {
