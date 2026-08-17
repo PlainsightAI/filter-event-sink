@@ -7,6 +7,13 @@ Event Sink filter release notes
 
 - **Promote the source-file identity to a `sourceuri` CloudEvent extension.** When an incoming frame carries `data['meta']['src']` (the entry filter's source-file identity, e.g. a batch object URI stamped via `FILTER_OVERRIDE_SOURCE_URI`), `build_cloudevent` now promotes it to a `sourceuri` extension — mirroring how `frameid` is promoted. A downstream consumer can store it as a typed queryable column, enabling per-source-file attribution of batch pipeline data. Absent for streaming or filters that don't carry `meta.src`.
 
+- **Promote the frame's source-file position (`sourceframe` / `sourceseconds`) as CloudEvent
+  extensions.** When a frame carries `data['meta']['src_frame']` / `data['meta']['src_seconds']`
+  (VideoIn file sources: the 0-based frame index and the offset in seconds within the source),
+  `build_cloudevent` now promotes them alongside `sourceuri`, mirroring `frameid`. CloudEvents has
+  no float attribute type, so both are sent as strings for a downstream consumer to parse into
+  typed numeric columns. Absent for streaming/webcam and sources with no decoder position.
+
 ### Changed
 
 - Bump the openfilter dependency to 1.3.0

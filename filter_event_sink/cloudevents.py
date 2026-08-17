@@ -33,10 +33,12 @@ def build_cloudevent(
     # Get timestamp
     timestamp = datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
 
-    # Extract data, frame ID (TI-130) and source URI to promote to extensions
+    # Extract data, frame ID (TI-130), source URI and source-file position to promote to extensions
     data = event.get('data', {})
     frame_id = None
     source_uri = None
+    source_frame = None
+    source_seconds = None
     if isinstance(data, dict):
         frame_id = data.get('id')
         # meta['src'] is the entry filter's source-file identity; may be
@@ -48,6 +50,17 @@ def build_cloudevent(
             src = meta.get('src')
             if isinstance(src, str) and src.strip():
                 source_uri = src
+            # src_frame / src_seconds are the frame's position within the source file (VideoIn
+            # file sources): the 0-based frame index and the offset in seconds. They map to typed
+            # numeric columns downstream. CloudEvents has no float attribute type, so both travel
+            # as strings and the consumer parses them to INT64 / FLOAT64. bool is excluded because
+            # it is an int subclass that would otherwise stringify as "True"/"False".
+            src_frame = meta.get('src_frame')
+            if isinstance(src_frame, int) and not isinstance(src_frame, bool):
+                source_frame = str(src_frame)
+            src_seconds = meta.get('src_seconds')
+            if isinstance(src_seconds, (int, float)) and not isinstance(src_seconds, bool):
+                source_seconds = repr(float(src_seconds))
 
     # Build CloudEvent
     cloudevent = {
@@ -74,5 +87,13 @@ def build_cloudevent(
     # can store it as a typed column. Absent for streaming.
     if source_uri is not None:
         cloudevent['sourceuri'] = source_uri
+
+    # Promote the frame's source-file position (index + seconds) as string extensions the
+    # consumer parses into typed numeric columns. Absent for streaming/webcam and other sources
+    # with no meaningful decoder position.
+    if source_frame is not None:
+        cloudevent['sourceframe'] = source_frame
+    if source_seconds is not None:
+        cloudevent['sourceseconds'] = source_seconds
 
     return cloudevent

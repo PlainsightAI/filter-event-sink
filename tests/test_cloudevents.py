@@ -221,6 +221,54 @@ class TestCloudEventFrameId(unittest.TestCase):
             )
             self.assertNotIn('sourceuri', cloudevent)
 
+    def test_source_frame_and_seconds_promoted(self):
+        """src_frame / src_seconds are promoted as string extensions (CloudEvents has no float
+        attribute type; the consumer parses them into INT64 / FLOAT64 columns)."""
+        event = {
+            'filter_name': 'TestFilter',
+            'topic': 'events',
+            'data': {'id': 7, 'meta': {'src': 'file://cars.mp4', 'src_frame': 45, 'src_seconds': 1.5}},
+        }
+        cloudevent = build_cloudevent(
+            event=event, pipeline_id='test-pipeline-id', event_source_base='filter://',
+        )
+        self.assertEqual(cloudevent['sourceframe'], '45')
+        self.assertEqual(cloudevent['sourceseconds'], '1.5')
+        # meta remains in data unchanged
+        self.assertEqual(cloudevent['data']['meta']['src_frame'], 45)
+        self.assertEqual(cloudevent['data']['meta']['src_seconds'], 1.5)
+
+    def test_source_frame_zero_promoted(self):
+        """Frame 0 (a falsy but valid index) must still be promoted — the guard is `is not None`,
+        not truthiness."""
+        event = {
+            'filter_name': 'TestFilter', 'topic': 'events',
+            'data': {'meta': {'src_frame': 0, 'src_seconds': 0.0}},
+        }
+        cloudevent = build_cloudevent(
+            event=event, pipeline_id='test-pipeline-id', event_source_base='filter://',
+        )
+        self.assertEqual(cloudevent['sourceframe'], '0')
+        self.assertEqual(cloudevent['sourceseconds'], '0.0')
+
+    def test_no_source_position_no_extension(self):
+        """sourceframe / sourceseconds are absent when the keys are missing or not a real number
+        (bool is an int subclass and must be rejected; already-string values too)."""
+        for data in (
+            {'class': 'person'},
+            {'meta': {'src': 'file://x.mp4'}},                    # no position keys
+            {'meta': {'src_frame': None, 'src_seconds': None}},
+            {'meta': {'src_frame': True, 'src_seconds': False}},  # bool rejected
+            {'meta': {'src_frame': '45', 'src_seconds': '1.5'}},  # already-string rejected
+            {'meta': {'src_frame': [1], 'src_seconds': {'x': 1}}},
+        ):
+            event = {'filter_name': 'TestFilter', 'topic': 'events', 'data': data}
+            cloudevent = build_cloudevent(
+                event=event, pipeline_id='test-pipeline-id', event_source_base='filter://',
+            )
+            self.assertNotIn('sourceframe', cloudevent)
+            self.assertNotIn('sourceseconds', cloudevent)
+
     def test_non_dict_data_no_frame_id(self):
         """Test that non-dict data doesn't cause errors"""
         event = {
