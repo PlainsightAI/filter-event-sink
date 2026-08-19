@@ -3,6 +3,8 @@ Event Sink filter release notes
 
 ## [Unreleased]
 
+## v1.1.9 - 2026-08-18
+
 ### Added
 
 - **Promote the source-file identity to a `sourceuri` CloudEvent extension.** When an incoming frame carries `data['meta']['src']` (the entry filter's source-file identity, e.g. a batch object URI stamped via `FILTER_OVERRIDE_SOURCE_URI`), `build_cloudevent` now promotes it to a `sourceuri` extension — mirroring how `frameid` is promoted. A downstream consumer can store it as a typed queryable column, enabling per-source-file attribution of batch pipeline data. Absent for streaming or filters that don't carry `meta.src`.
@@ -16,7 +18,9 @@ Event Sink filter release notes
 
 ### Changed
 
-- Bump the openfilter dependency to 1.3.0
+- Update the openfilter dependency to 1.3.0
+- Add Python 3.14 support: raise the `requires-python` ceiling to `<3.15` and add 3.14 to the CI
+  test matrix (3.10–3.13 unchanged).
 
 ## v1.1.8 - 2026-08-10
 
