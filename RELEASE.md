@@ -3,6 +3,8 @@ Event Sink filter release notes
 
 ## [Unreleased]
 
+## v1.1.12 - 2026-11-24
+
 ### Changed
 
 - Bump the openfilter dependency to 1.5.0
@@ -10,6 +12,8 @@ Event Sink filter release notes
 - Bump the openfilter dependency to 1.5.2
 - Bump the openfilter dependency to 1.5.3
 - Bump the openfilter dependency to 1.5.4
+- Update the `urllib3` pin to 2.8.0, fixing CVE-2026-97687, CVE-2026-97688 and CVE-2026-97689
+- Update the dev `black` pin to 26.10.1
 
 ## v1.1.11 - 2026-09-23
 
